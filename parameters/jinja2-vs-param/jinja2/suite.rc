@@ -1,0 +1,15 @@
+[cylc]
+    [[parameters]]
+        i = 1..5
+[scheduling]
+    [[dependencies]]
+        graph = """
+            foo => bar<i> => baz
+            bar<i=3> => special
+        """
+[runtime]
+    [[bar<i>]]
+        script = some-script $CYLC_TASK_PARAM_i
+    [[bar<i=3>]]
+        [[[environment]]]
+            SOME_SWITCH = 1

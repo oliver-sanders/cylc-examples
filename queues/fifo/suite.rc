@@ -1,0 +1,35 @@
+#!Jinja2
+
+[meta]
+    title = FIFO Queues In Cylc
+    description = """
+        Cylc's interal queues are now FIFO (first in first out), this can be
+        used to prioritise items.
+    """
+
+[cylc]
+    [[parameters]]
+        ensemble = 1..5
+    [[parameter templates]]
+        ensemble = %(ensemble)02d
+
+[scheduling]
+    [[queues]]
+        [[[ensemble_queue]]]
+            members = <ensemble>
+            limit = 5
+
+    [[dependencies]]
+        graph = """
+            start => foo<ensemble> => bar<ensemble> & baz<ensemble> =>
+            pub<ensemble> => end
+        """
+
+[runtime]
+    [[root]]
+        script = sleep 1
+
+    [[<ensemble>]]
+
+    [[foo<ensemble>, bar<ensemble>, baz<ensemble>, pub<ensemble>]]
+        inherit = <ensemble>

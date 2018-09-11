@@ -1,0 +1,17 @@
+#!jinja2
+
+{% set tasks = {'foo': 'sleep 1',
+                'bar': 'true',
+                'baz': 'echo baz'} -%}
+
+[scheduling]
+    [[dependencies]]
+        graph = """
+            {{ tasks | join(' => ') }}
+        """
+[runtime]
+
+{% for task, command in tasks.items() -%}
+    {% import 'module.rc' as task_config with context -%}
+    {{ task_config }}
+{% endfor -%}

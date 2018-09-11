@@ -1,0 +1,15 @@
+#!Jinja2
+
+[cylc]
+    UTC mode = True
+[scheduling]
+    initial cycle point = {{ START_CYCLE }}
+    #final cycle point = {{ FINAL_CYCLE }}
+    [[dependencies]]
+        [[[T00]]]
+            graph = create_file[-P1D] => create_file => archive
+[runtime]
+    [[root]]
+        script = rose task-run
+    [[archive]]
+    [[create_file]]

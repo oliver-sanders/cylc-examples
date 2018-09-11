@@ -1,0 +1,13 @@
+#!Jinja2
+
+[cylc]
+    [[parameters]]
+        language = english, french, german
+[scheduling]
+    [[dependencies]]
+        graph = answer<language>
+[runtime]
+    [[answer<language>]]
+        script = rose task-run --opt-conf-key=$CYLC_TASK_PARAM_language
+        [[[environment]]]
+            ROSE_TASK_APP = answer

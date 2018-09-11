@@ -1,0 +1,20 @@
+# In this example all members of the ENSEMBLE family are added to the queue
+# called "my_queue", consequently they will be run one at a time (limit=1).
+
+[cylc]
+    [[parameters]]
+        m = 0..9
+[scheduling]
+    [[queues]]
+        [[[my_queue]]]
+            members = ENSEMBLE
+            limit = 1
+    [[dependencies]]
+        graph = """
+            start => ensemble_member<m> => end
+        """
+[runtime]
+    [[ENSEMBLE]]
+        script = sleep 2
+    [[ensemble_member<m>]]
+        inherit = ENSEMBLE

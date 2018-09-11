@@ -1,0 +1,56 @@
+#!Jinja2
+#
+# README
+# ======
+#
+# This suite is an outline of how to write inter-cycle dependencies between
+# arbitrary cycles in cylc.
+#
+# In the future we hope to introduce relative inter-cycle dependencies which
+# would make this easy: https://github.com/cylc/cylc/issues/2452.
+#
+# In the mean time the issue is a little more tricky. This method is a last
+# resort approach, there are two other methods which might be easier but
+# are more limited in their capability:
+#
+# 1) If you want your cycles to run strictly in order you could set:
+#
+#    [scheduling]
+#        max active cycle points = 1
+#
+#    This will cause the suite to be run one cycle [and only one cycle] at a
+#    time.
+#
+# 2) If you want to write an inter-cycle dependency between the same task in
+#    different cycles you may be able to get away with:
+#
+#    [scheduling]
+#        [[special tasks]]
+#            sequential = my_task
+#
+# IMPORTANT: This approach requires rose to be installed.
+#
+# Use cylc graph to view the result:
+#    $ cylc graph . 2000-01-01T00:00Z 2009-12-21T18:00Z
+
+{% set cycles = [
+    "2000-01-01T00:00Z",
+    "2000-05-28T12:00Z",
+    "2001-07-13T06:30Z",
+    "2009-12-21T18:00Z"
+] %}
+
+[scheduling]
+    initial cycle point = {{cycles[0]}}
+    final cycle point = {{cycles[-1]}}
+    [[dependencies]]
+{% for cycle in cycles %}
+        [[[R1/{{ cycle }}]]]
+            graph = """
+{# NOTE: can use loop.previtem at Jinja2 V 2.10 #}
+{% if not loop.first %}
+                bar[{{ cycle | duration(cycles[loop.index - 2]) }}] => foo
+{% endif %}
+                foo => bar & baz => pub
+            """
+{% endfor %}

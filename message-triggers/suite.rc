@@ -1,0 +1,28 @@
+# With cylc you can trigger off of the outcome of tasks e.g. success, fail,
+# but you can also trigger off of "events" within a particular task. This is
+# achived using `cylc message` within a particular task.
+
+[scheduling]
+    [[dependencies]]
+        graph = """
+            a:foo => b
+            a:bar => c
+            a:baz => d
+            b | c | d => e
+        """
+[runtime]
+    [[root]]
+        script = sleep 4
+    [[a]]
+        script = """
+            sleep 1
+            cylc message "foo trigger"
+            sleep 2
+            cylc message "bar trigger"
+            sleep 1
+            cylc message "baz can now run"
+        """
+        [[[outputs]]]
+            foo = "foo trigger"
+            bar = "bar trigger"
+            baz = "baz can now run"

@@ -1,0 +1,38 @@
+# This is an example of how to write many to many dependencies efficiently in
+# cylc. This is not restricted to families but applies to any group of tasks
+# where many to many dependencies are present.
+
+# Run `cylc graph . &` to view the suite.
+
+[scheduling]
+    [[dependencies]]
+        graph = """
+            ### If BAR depends on FOO the temptation would be to write a family
+            ### trigger directly like so:
+
+            # FOO:succeed-all => BAR
+
+            ### Unfortunately this approach can create large numbers of
+            ### dependencies which can cause cylc suites to use large amounts
+            ### of RAM and become slow.
+
+            ### To get around the problem introduce a dummy task between the
+            ### two families like so:
+
+            FOO:succeed-all => dummy => BAR
+
+            ### The dummy task will succeed as soon as it is run. This approach
+            ### dramatically reduces the number of dependencies as the families
+            ### grow in size.
+        """
+
+[runtime]
+    [[FOO]]
+    [[BAR]]
+    [[foo, fool, foot, foul]]
+        inherit = FOO
+    [[bar, beer, pub]]
+        inherit = BAR
+
+    [[dummy]]
+        script = true  # Do nothing.

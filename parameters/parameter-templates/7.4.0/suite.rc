@@ -1,0 +1,12 @@
+[cylc]
+    [[parameters]]
+        a = 9..11
+        b = 9..11
+    [[parameter templates]]
+        a = _a%(a)s  # This is the default template.
+        b = _%(b)s  # We can get rid of the parameter name like this.
+[scheduling]
+    [[dependencies]]
+        # foo<a> = ( foo_a09, foo_a10, foo_a11 )
+        # bar<b> = ( bar_09, bar_10, bar_11 )
+        graph = foo<a> => bar<b>

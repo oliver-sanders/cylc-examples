@@ -1,0 +1,11 @@
+#
+# abc = 123
+
+[scheduling]
+    [[dependencies]]
+        graph = foo
+[runtime]
+    [[foo]]
+        [[[environment]]]
+            abc = 123
+            bcd = 234

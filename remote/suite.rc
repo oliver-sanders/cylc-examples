@@ -1,0 +1,22 @@
+#!jinja2
+{# Rose Configuration Insertion: Init #}
+{% set CYLC_VERSION="7.5.0-202-g830bd0-dirty" %}
+{% set ROSE_ORIG_HOST="eld668" %}
+{% set ROSE_VERSION="2017.09.0-109-gb4454c6f" %}
+{# Rose Configuration Insertion: Done #}
+[scheduling]
+    [[dependencies]]
+        graph = """
+            foo & bar & baz
+        """
+[runtime]
+    [[foo]]
+        script = echo "I run on the cylc server."
+    [[bar]]
+        script = echo "I run on your desktop."
+        [[[remote]]]
+            host = $ROSE_ORIG_HOST
+    [[baz]]
+        script = echo "I run on SPICE."
+        [[[job]]]
+            batch system = slurm

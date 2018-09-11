@@ -1,0 +1,16 @@
+#!Jinja2
+
+{% set foo =  ' ' | custom_filter -%}
+
+[scheduling]
+    [[dependencies]]
+        graph = """
+{% for task in foo %}
+            {{ task }}
+{% endfor -%}
+        """
+[runtime]
+{% for task, value in foo.items() %}
+    [[{{task}}]]
+        script = echo "{{ value }}"
+{% endfor -%}

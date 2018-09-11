@@ -1,0 +1,14 @@
+[cylc]
+    UTC mode = True
+[scheduling]
+    initial cycle point = 2000-01-01T00Z
+    [[dependencies]]
+        [[[T00]]]
+            graph = foo[-P1D] => foo
+[runtime]
+    [[root]]
+        script = rose task-run
+    [[foo]]
+        env-script = eval $(rose task-env)
+        [[[environment]]]
+            YEAR = $(rose date -c --print-format='CCYY')

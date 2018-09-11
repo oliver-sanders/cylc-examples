@@ -1,0 +1,4 @@
+#!/bin/bash
+
+rose suite-run -C 'suite' --name 'bar/alpha' &
+rose suite-run -C 'suite' --name 'bar/beta'

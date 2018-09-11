@@ -1,0 +1,7 @@
+[runtime]
+    [[yesterday]]
+        script = echo yesterday
+    [[today]]
+        script = echo today
+    [[cockrel_crows]]
+        script = echo "cockadooldledoo"

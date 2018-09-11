@@ -1,0 +1,14 @@
+[scheduling]
+    cycling mode = integer
+    initial cycle point = 1
+    [[dependencies]]
+        [[[P1]]]
+            graph = """
+                a => b => c
+                b => h
+                h[-P1] => h  # Execute these tasks sequentially
+            """
+[runtime]
+    [[root]]
+        script = sleep 1
+    [[a, b, c, h]]

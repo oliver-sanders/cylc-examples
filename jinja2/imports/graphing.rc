@@ -1,0 +1,6 @@
+[scheduling]
+    [[dependencies]]
+        [[[T00]]]
+            graph = yesterday => today
+        [[[T06]]]
+            graph = cockrel_crows

@@ -1,0 +1,26 @@
+[cylc]
+    [[parameters]]
+        param = {{ START }}..{{ END }}..{{ STEP }}
+    [[parameter templates]]
+        param = _%(param)0{{ PADDING }}d
+
+[scheduling]
+    [[dependencies]]
+        graph = """
+            foo => bar<param> => baz
+        """
+
+[runtime]
+    [[foo, baz]]
+        script = true
+    [[bar<param>]]
+        script = """
+            # both integers
+            echo CYLC_TASK_PARAM_param=$CYLC_TASK_PARAM_param
+            echo PARAMETER_INTEGER=$PARAMETER_INTEGER
+            # zero padded integer
+            echo PARAMETER=$PARAMETER
+        """
+        [[[parameter environment templates]]]
+            PARAMETER_INTEGER = %(param)d        # without zero padding
+            PARAMETER = %(param)0{{ PADDING }}d  # with zero padding

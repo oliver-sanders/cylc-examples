@@ -1,0 +1,14 @@
+#!Jinja2
+
+{% set SWITCH = 'bar' %}
+
+[scheduling]
+    [[dependencies]]
+        graph = foo
+[runtime]
+    [[root]]
+        script = rose task-run
+        [[[environment]]]
+            ROSE_TASK_APP = {{ SWITCH }}/$CYLC_TASK_NAME
+    [[foo]]
+

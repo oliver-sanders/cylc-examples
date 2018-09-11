@@ -1,0 +1,10 @@
+#!Jinja2
+
+[scheduling]
+    [[dependencies]]
+        graph = irreg
+[runtime]
+    [[root]]
+        script = sleep 1
+    [[irreg]]
+

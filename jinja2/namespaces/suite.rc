@@ -1,0 +1,77 @@
+#!Jinja2
+
+# -----------------------------------------------------------------------------
+
+# IMPORTANT: To run this example you must use cylc 7.6.0 or above.
+
+# -----------------------------------------------------------------------------
+
+# The following examples will attempt to generate lists of even and odd numbers
+# in Jinja2. Obviously this could be easily done using range,
+# e.g. range(0, 10, 2) but for illustrative purposes we will try to use for
+# loops instead.
+
+# -----------------------------------------------------------------------------
+
+# With Jinja2 variable scope applies within blocks, so if you declare a variable
+# within a for loop it will ONLY be available within that for loop and not
+# anywhere else.
+#
+# So for example this code will not work.
+
+{% set evens = [] -%}
+{% set odds = [] -%}
+
+{% for number in range(10) -%}
+    {% if number % 2 == 0 -%}
+        {% set evens = evens + [number] -%}
+    {% else -%}
+        {% set odds = odds + [number] -%}
+    {% endif -%}
+{% endfor -%}
+
+# Evens: {{ evens }}
+# Odds:  {{ odds }}
+
+# Use `cylc get-config --sparse suite.rc` to see the above code evaluated.
+
+# -----------------------------------------------------------------------------
+
+# To overcome the limitations of this Jinja2.10 introduced namespace() as an
+# object which can be mutated from within a block.
+#
+# This example shows how to use the namespace() feature to generate two chains
+# of tasks, one composed of even numbers and one of odds. Obviously this can be
+# done better using range(0, 10, 2) for for demonstrative purposes ...
+
+{% set ns = namespace(evens=[], odds=[]) %}
+
+{% for number in range(10) -%}
+    {% if number % 2 == 0 -%}
+        {% set ns.evens = ns.evens + [number] -%}
+    {% else -%}
+        {% set ns.odds = ns.odds + [number] -%}
+    {% endif -%}
+{% endfor -%}
+
+# Evens: {{ ns.evens }}
+# Odds:  {{ ns.odds }}
+
+# Use `cylc get-config --sparse suite.rc` to see the above code evaluated.
+
+# -----------------------------------------------------------------------------
+
+# Bellow is an example suite making use of the evens and odds lists.
+
+[scheduling]
+    [[dependencies]]
+        graph = """
+            {{ ns.evens | join(" => ") }}
+            {{ ns.odds | join(" => ") }}
+        """
+
+[runtime]
+    [[{{ ns.evens | join(', ') }}]]
+        script = echo even
+    [[{{ ns.odds | join(', ') }}]]
+        script = echo odd

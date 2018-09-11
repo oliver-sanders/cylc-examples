@@ -1,0 +1,31 @@
+[scheduling]
+    [[dependencies]]
+        graph = """
+            start => ENSEMBLE
+
+            # Allow the downstream task to trigger off of recover so that the
+            # suite keeps running.
+            ENSEMBLE:succeed-all | recover => end
+
+            # The recovery task.
+            ENSEMBLE:fail-any => recover => end
+
+            # Remove the ENSEMBLE members (both failed and succeeded) from the
+            # graphing so that the failed tasks aren't left hanging around
+            # (can cause the suite to grind to a halt).
+            recover => ! ENSEMBLE
+
+            # If the ENSEMBLE members all succeed then there is no need for
+            # the recovery task.
+            ENSEMBLE:succeed-all => ! recover
+        """
+[runtime]
+    [[root]]
+        script = sleep 1
+    [[start, end, recover]]
+    [[ENSEMBLE]]
+    [[foo, bar, baz]]
+        inherit = ENSEMBLE
+        script = sleep 3
+    [[baz]]
+        script = false

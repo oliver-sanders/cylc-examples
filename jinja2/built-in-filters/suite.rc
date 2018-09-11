@@ -1,0 +1,27 @@
+#!Jinja2
+
+{% set VARIABLE = False %}
+
+# This line will stop the suite being run.
+{{ assert(VARIABLE==True, 'Suite cannot run unless VARIABLE is set to TRUE') }}
+
+
+{% set START_CYCLE = '2000-01-01T08:00Z' %}
+{% set ANOTHER_VARIABLE = 21 %}
+
+[cylc]
+    UTC mode = True
+[scheduling]
+    initial cycle point = {{ START_CYCLE }}
+    [[dependencies]]
+        [[[R1]]]
+           graph = foo => bar
+[runtime]
+    [[foo]]
+        script = echo $HOUR  # Will echo 08
+        [[[environment]]]
+            HOUR = {{ START_CYCLE | strftime('%H') }}
+    [[bar]]
+        script = echo $NUMBER  # Will echo --21
+        [[[environment]]]
+            NUMBER = {{ ANOTHER_VARIABLE | pad(4, '-') }}

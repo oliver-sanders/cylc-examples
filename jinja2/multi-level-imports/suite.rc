@@ -1,0 +1,24 @@
+#!Jinja2
+
+# Importing using jinja2 from a file that was imported by jinja2 is fine.
+# This test demonstrates this, obviously this is an utterly horrible example!
+
+# cylc get-config --sparse -s 'start=1' -s 'end=5' "$PWD"
+
+{% set start = start | int %}
+{% set end = end | int %}
+
+[scheduling]
+    cycling mode = integer
+    initial cycle point = 1
+    [[dependencies]]
+        [[[P1]]]
+            graph = task_{{ start }}
+
+[runtime]
+    [[task_{{start}}]]
+
+{% if start < end %}
+    {% set start = start + 1 %}
+    {% include "suite-%s.rc" % start %}
+{% endif %}

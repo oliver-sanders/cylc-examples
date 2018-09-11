@@ -1,0 +1,15 @@
+#!jinja2
+{# jinja2 comment #}
+{# if False #}  # This comment will do nothing see suite.rc.processed for proof
+    {% set abc = 123 %}
+{# endif #}
+# abc = {{ abc }}
+
+[scheduling]
+    [[dependencies]]
+        graph = foo
+[runtime]
+    [[foo]]
+        [[[environment]]]
+            abc = {{ abc }}
+            bcd = {{ bcd }}

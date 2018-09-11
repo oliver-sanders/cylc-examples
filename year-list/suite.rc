@@ -1,0 +1,33 @@
+#!Jinja2
+
+{# This bit is just to show how to pass jinja2 variables to a script. #}
+{% set value = 'some command line value %}
+
+{# This is being provided by the -S command line option. #}
+{% set START_POINT = '200001010000' %}
+{% set END_POINT = '200901010000' %}
+
+{# These lines compute the start and end years from START_POINT and END_POINT. #}
+{% set start_year = START_POINT | strftime('%Y', '%Y%m%d%H%M') | int %}
+{% set end_year = END_POINT | strftime('%Y', '%Y%m%d%H%M') | int %}
+
+[cylc]
+    [[parameters]]
+        # This line provides cylc with a list of years.
+        years = {% for year in range(start_year, end_year) %}{{year}},{% endfor %}
+
+[scheduling]
+    [[dependencies]]
+        graph = """
+            start => task<years={{start_year}}>  # This is the start year
+            task<years - 1> => task<years>
+            task<years={{end_year}}> => end  # This is the end year
+        """
+[runtime]
+    [[root]]
+        script = sleep 1
+    [[task<years>]]
+        script = some-command --option {{value}} --start=$start-year --end=$end_year
+        [[[environment]]]
+            start_year = $CYLC_TASK_PARAM_year  # The value of <year>.
+            end_year = $(( $start_year + 1 ))   # Add 1 to this value.

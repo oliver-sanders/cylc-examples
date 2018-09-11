@@ -1,0 +1,8 @@
+[scheduling]
+    [[dependencies]]
+        graph = foo
+[runtime]
+    [[root]]
+        script = sleep 10
+    [[foo]]
+

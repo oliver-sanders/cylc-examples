@@ -1,0 +1,10 @@
+#!/bin/bash
+
+cylc reg 'foo/alpha' 'suite'
+cylc reg 'foo/beta' 'suite'
+
+cylc run 'foo/alpha' &
+cylc run 'foo/beta' &
+
+cylc gui 'foo/alpha' &
+cylc gui 'foo/beta' &

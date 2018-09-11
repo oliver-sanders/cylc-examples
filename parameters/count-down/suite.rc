@@ -1,0 +1,45 @@
+# IMPORTANT: Run this suite using cylc 7.6.0 or higher.
+
+
+[cylc]
+    [[parameters]]
+        # Define the parameter count_down with values 1, 2, 3, 4, 5
+        count_down = 1..5  # Ranges are inclusive.
+
+    [[parameter templates]]
+        # parameter templates affect the way parameters are presented.
+
+        # This example would result in: count_down_01, count_down_02, ...
+        count_down = count_down_%(count_down)02d
+
+        # This example would result in: _1, _2, _3
+        # count_down = _%(count_down)d
+
+        # Note that the default parameter templates have a leading underscore to
+        # separate the parameter from the rest of the task name so that you can
+        # write foo<param> rather than foo_<param>.
+
+[scheduling]
+    [[dependencies]]
+        graph = """
+            # This line sets: count_down_1 => count_down_2, ...
+            # The -1 refers to the previous parameter (+1 would be the next).
+            <count_down> => <count_down - 1>
+
+            # You can specify a particular parameter by name using =.
+            <count_down = 1> = > launch
+        """
+
+[runtime]
+    [[<count_down>]]
+        script = echo $NUMBER
+
+        [[[parameter environment templates]]]
+            # If we want our environment variable to be of a different format to
+            # the parameter we can use a parameter environment template.
+
+            # In this example the parameter has the format count_down_N but for
+            # our task we just want the number (N) so we define an environment
+            # template. This environment variable is then made available to the
+            # task.
+            NUMBER = '%(count_down)d'

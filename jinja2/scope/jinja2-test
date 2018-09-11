@@ -1,0 +1,15 @@
+# Run this with `compile`
+#
+# With Jinja2 if you set a variable within a block (e.g. for) then it is only
+# avaliable within that block.
+#
+# See also: https://qamichaelpeng.github.io/2014/12/14/jinja2_scope.html
+# See also: http://jinja.pocoo.org/docs/2.9/templates/#block-nesting-and-scope
+#
+# Try setting a jinja2 variable within a loop.
+{%- set VALUE=5 -%}
+{%- for i in [1,2,3] -%}
+    {%- set VALUE=10 -%}
+{% endfor %}
+
+{{ VALUE }} # Fail!

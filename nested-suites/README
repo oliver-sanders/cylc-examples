@@ -1,0 +1,12 @@
+Suites can be grouped or nested by registering them using a file path.
+
+E.g. if we register two suites as "foo/alpha" and "foo/beta" we will end up with
+two suites which will appear in the cylc-run directory as:
+
+cylc-run/
+ `- foo/
+     |- alpha/
+     `- beta/
+
+The cylc-run and rose-run bash scripts show how to achive this the cylc way
+and the rose way.

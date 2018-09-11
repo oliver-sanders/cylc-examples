@@ -1,0 +1,20 @@
+#!Jinja2
+
+{% set I = 5 %}
+
+[scheduling]
+    [[dependencies]]
+        graph = """
+{% for i in range(I) %}
+            foo => bar_{{i}} => baz
+{% endfor %}
+            bar_3 => special
+        """
+[runtime]
+{% for i in range(I) %}
+    [[bar_{{i}}]]
+        script = some-script {{i}}
+{% endfor %}
+    [[bar_3]]
+        [[environment]]
+            SOME_SWITCH = 1

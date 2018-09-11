@@ -1,0 +1,32 @@
+# Suicide triggers allow us to remove tasks from a suites "graph" whilst it is
+# running. These are typically used to define sub-workflows to be run if a
+# task fails.
+
+[scheduling]
+    [[dependencies]]
+        graph = """
+            # The success pathway would be "start" => "sometask" => "end".
+            start => sometask
+            sometask | recover => end
+
+            # If "sometask" fails then we will need to run the "recover" task.
+            sometask:fail => recover
+
+            # If "sometask" succeeds then we DO NOT need to run the "recover"
+            # task so we use a suicide trigger to remove it.
+            sometask => ! recover
+
+            # Finally, because cylc keeps failed tasks active (so that you can
+            # re-trigger them at a later date) we will need to remove
+            # "sometask" from the graph (else it will hang around indefinitely
+            # which will likely cause your suite to hit its runahead limit
+            # and stall.
+            # We remove "sometask" with a suicide trigger (remember that
+            # dependencies are :success by default).
+            recover => ! sometask
+        """
+[runtime]
+    [[start, end, recover]]
+        script = sleep 1
+    [[sometask]]
+        script = false  # Try changing this to true

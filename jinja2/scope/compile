@@ -1,0 +1,19 @@
+#!/usr/bin/env python
+
+CYLC_PATH = '/home/h03/fcm/cylc-7.1.0/lib'
+import sys
+sys.path.insert(0, CYLC_PATH)
+try:
+    from jinja2 import Template
+except ImportError:
+    print 'ERROR: Could not pick up Jinja2 from ' % CYLC_PATH
+
+def main(filename):
+    with open(filename, 'r') as template_file:
+        template_string = template_file.read()
+    template = Template(template_string)
+    print template.render()
+
+
+if __name__ == '__main__':
+    main(sys.argv[1])

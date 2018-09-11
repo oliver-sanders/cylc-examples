@@ -1,0 +1,16 @@
+[scheduling]
+    initial cycle point = 2000
+    [[dependencies]]
+        [[[T-00]]]
+            graph = housekeep[-PT1H] => foo => housekeep
+[runtime]
+    [[root]]
+        script = rose task-run
+    [[foo]]
+        script = """
+            mkdir -p foo/bar
+            echo alpha > foo/bar/alpha
+            echo beta > foo/beta
+        """
+    [[housekeep]]
+

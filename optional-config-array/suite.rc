@@ -1,0 +1,21 @@
+#!Jinja2
+
+[cylc]
+    [[parameters]]
+        resolution = 1..3
+    [[parameter templates]]
+        resolution = _%(resolution)s
+
+[scheduling]
+    [[dependencies]]
+        graph = foo<resolution>
+[runtime]
+    [[root]]
+        script = rose task-run
+        [[[environment]]]
+            SITE = meto
+
+    [[foo<resolution>]]
+        [[[environment]]]
+            ROSE_TASK_APP = foo
+            ROSE_APP_OPT_CONF_KEYS = "${SITE}-${CYLC_TASK_PARAM_resolution}"

@@ -1,0 +1,33 @@
+[meta]
+    description = """
+        Suite showing how to use the $CYLC_TASK_DEPENDENCIES variable to obtain
+        the work directories of prerequisite tasks.
+    """
+
+[cylc]
+    UTC mode = True
+
+[scheduling]
+    initial cycle point = 20000101T00Z
+    final cycle point = 20000103T00Z
+    [[dependencies]]
+        [[[T00]]]
+            graph = """
+                foo[-P1D] & bar => foo
+            """
+
+[runtime]
+    [[root]]
+        pre-script = """
+            # create a new file
+            echo "$CYLC_TASK_ID" > data_file
+        """
+    [[foo]]
+        script = """
+            # read in files from dependent tasks
+            for task_id in $CYLC_TASK_DEPENDENCIES; do
+                IFS=$'.' read -ra task <<< "$task_id"
+                cat "$CYLC_SUITE_WORK_DIR/${task[1]}/${task[0]}/data_file"
+            done
+        """
+    [[bar]]

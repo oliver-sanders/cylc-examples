@@ -1,0 +1,16 @@
+[cylc]
+    [[parameters]]
+        a = 9..11
+        b = 9..11
+        c = 9..11
+    [[parameter templates]]
+        #a = _a%(d)02s  # This is the default template, the padding is
+                        # automatically adjusted to your parameters.
+        b = _%(b)02d    # We can get rid of the parameter name like this.
+        c = _%(c)s      # Un-converted templates will loose their zero padding.
+[scheduling]
+    [[dependencies]]
+        # foo<a> = ( foo_a09, foo_a10, foo_a11 )
+        # bar<b> = ( bar_09,  bar_10,  bar_11  )
+        # pub<c> = ( pub_9,   pub_10,  pub_11  )
+        graph = foo<a> => bar<b> => pub<c>

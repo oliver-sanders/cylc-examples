@@ -1,0 +1,19 @@
+#!Jinja2
+
+{% set start = start | int %}
+{% set end = end | int %}
+
+[scheduling]
+    cycling mode = integer
+    initial cycle point = 1
+    [[dependencies]]
+        [[[P1]]]
+            graph = task_{{ start }}
+
+[runtime]
+    [[task_{{start}}]]
+
+{% if start < end %}
+    {% set start = start + 1 %}
+    {% include "suite-%s.rc" % start %}
+{% endif %}
