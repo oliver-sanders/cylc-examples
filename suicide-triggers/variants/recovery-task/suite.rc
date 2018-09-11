@@ -1,0 +1,23 @@
+[scheduling]
+    [[dependencies]]
+        graph = """
+            # Regular graph.
+            foo => bar
+
+            # The fail case.
+            bar:fail => recover
+
+            # Remove the "recover" task in the success case.
+            bar => ! recover
+
+            # Remove the "bar" task in the fail case.
+            recover => ! bar
+
+            # Downstream dependencies.
+            bar | recover => baz
+        """
+[runtime]
+    [[root]]
+        script = sleep 1
+    [[bar]]
+        script = false

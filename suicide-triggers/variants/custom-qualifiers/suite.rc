@@ -1,0 +1,36 @@
+[scheduling]
+    [[dependencies]]
+        [[[R1]]]
+            graph = """
+                # In the "good" case run "good" but not "bad" or "ugly".
+                showdown:good => good & ! bad & ! ugly
+
+                # In the "bad" case run "bad" but not "good" or "ugly".
+                showdown:bad => bad & ! good & ! ugly
+
+                # In the "ugly" case run "ugly" but not "good" or "bad".
+                showdown:ugly => ugly & ! good & ! bad
+
+                good | bad | ugly => fin
+            """
+[runtime]
+    [[root]]
+        script = sleep 1
+    [[showdown]]
+        # Randomly return one of the three custom outputs.
+        script = """
+            SEED=$RANDOM
+            if ! (( $SEED % 3 )); then
+                cylc message 'The-Good'
+            elif ! (( ( $SEED + 1 ) % 3 )); then
+                cylc message 'The-Bad'
+            else
+                cylc message 'The-Ugly'
+            fi
+        """
+        [[[outputs]]]
+            # Register the three custom outputs with cylc.
+            good = 'The-Good'
+            bad = 'The-Bad'
+            ugly = 'The-Ugly'
+

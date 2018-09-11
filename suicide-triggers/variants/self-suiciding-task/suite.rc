@@ -1,0 +1,14 @@
+[scheduling]
+    [[dependencies]]
+        graph = """
+            foo => bar => baz
+            bar => pub
+
+            # Remove the "pub" task in the event of failure.
+            pub:fail => ! pub
+        """
+[runtime]
+    [[root]]
+        script = sleep 1
+    [[pub]]
+        script = false

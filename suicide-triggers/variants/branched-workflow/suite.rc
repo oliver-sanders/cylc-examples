@@ -1,0 +1,29 @@
+[scheduling]
+    [[dependencies]]
+        graph = """
+            # Regular graph.
+            foo => bar
+
+            # Success case.
+            bar => tar & jar
+
+            # Fail case.
+            bar:fail => baz => jaz
+
+            # Remove tasks from the fail branch in the success case.
+            bar => ! baz & ! jaz
+
+            # Remove tasks from the success branch in the fail case.
+            bar:fail => ! tar & ! jar & ! par
+
+            # Remove the bar task in the fail case.
+            baz => ! bar
+
+            # Downstream dependencies.
+            tar | jaz => pub
+        """
+[runtime]
+    [[root]]
+        script = sleep 1
+    [[bar]]
+        script = true
