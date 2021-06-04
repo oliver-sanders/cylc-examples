@@ -1,0 +1,82 @@
+#!Jinja2
+
+{# command used for conda installation (i.e. conda or mamba, mamba is faster) #}
+{% set CONDA = 'conda' %}
+{% set CONDA_SH = '<path-to-conda>/etc/profile.d/conda.sh' %}
+
+{% from "pathlib" import Path %}
+{% do assert(Path(CONDA_SH).exists(), 'please configure CONDA_SH') %}
+
+[scheduler]
+    install = env/  # install the env/ dir on remote platforms
+
+[task parameters]
+    {% set environments = ['one'] %}
+    environment = {{ environments | join(', ') }}
+    model = a, b, c
+    platform = localhost
+
+[scheduling]
+    cycling mode = integer
+    initial cycle point = 1
+    final cycle point = 1
+    [[graph]]
+        R1 = """
+            conda_build<environment, platform> => model<model, platform>
+        """
+        P1 = """
+            model<model, platform>[-P1] => model<model, platform>
+        """
+
+[runtime]
+    # configure the conda environments
+    {% for environment in environments %}
+        {# sadly we must use Jinja2 for this rather than environments #}
+        {# should be able to fix this in a later release of Cylc 8 #}
+        {# https://github.com/cylc/cylc-flow/issues/4242 #}
+
+        [[conda_build_{{environment}}<platform>]]
+            inherit = ENV_{{environment}}
+            platform = $(echo $CYLC_TASK_PARAM_platform)
+            script = """
+                # delete any previously installed env
+                {{ CONDA }} env remove -n "$ENV_NAME"
+                # build new env
+                # (note packages from previous builds will likely be cached)
+                {{ CONDA }} env create -n "$ENV_NAME" -f "$ENV_FILE"
+            """
+
+        [[ENV_{{ environment }}]]
+            pre-script = """
+                . {{ CONDA_SH }}
+            """
+            [[[environment]]]
+                ENV_NAME = ${CYLC_WORKFLOW_NAME}_{{ environment }}
+                ENV_FILE = ${CYLC_WORKFLOW_RUN_DIR}/env/{{ environment }}.yml
+    {% endfor %}
+
+    # configure the different models
+    [[model<model=a, platform>]]
+        inherit = ENV_one  # use the environment "one"
+        script = """
+            conda run -n "$ENV_NAME" \
+                python --version
+        """
+
+    [[model<model=b, platform>]]
+        inherit = ENV_one  # use the environment "one"
+        script = """
+            conda run -n "$ENV_NAME" \
+                python -c 'print("hello world")'
+        """
+
+    [[model<model=c, platform>]]
+        inherit = ENV_two  # use the environment "two"
+        script = """
+            conda run -n "$ENV_NAME" \
+                node --version
+        """
+
+    # configure the different platforms
+    [[model<model, platform>]]
+        platform = $(echo $CYLC_TASK_PARAM_platform)
