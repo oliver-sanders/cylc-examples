@@ -1,0 +1,5 @@
+name: one
+channels:
+  - conda-forge
+dependencies:
+  - nodejs
