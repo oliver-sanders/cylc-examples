@@ -1,0 +1,25 @@
+#!Jinja2
+
+[meta]
+    description = """
+    	This example shows how a Jinja2 filter can be used to convert between
+	ISO8601 durations (e.g. PT6H) and a list of times for use with the
+	'initial cycle point' previous and next statements
+	(e.g. 'T00; T06; T12; T18').
+
+	Examples:
+	    $ cylc view --process --stdout .
+	    $ cylc view --process --stdout . -s DURATION='PT12H'
+	    $ cylc view --process --stdout . -s OFFSET='02'
+    """
+
+{% set DURATION  = DEFAULT | default('PT6H') -%}
+{% set OFFSET = OFFSET | default('00') -%}
+
+[scheduling]
+    initial cycle point = "previous({{ DURATION | duration_to_time(OFFSET) | join(';') }})"
+    [[dependencies]]
+        [[[{{ DURATION }}]]]
+            graph = """
+                a[-{{ DURATION }}] => a
+            """
